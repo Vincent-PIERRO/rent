@@ -1,9 +1,6 @@
-#FROM gradle:8.14-jdk21 AS builder
-FROM gradle:8.5-jdk21 AS builder
+FROM gradle:8.14-jdk21 AS builder
 WORKDIR /app
-COPY build.gradle settings.gradle gradlew gradlew.bat ./
-COPY gradle ./gradle
-COPY src ./src
+COPY . .
 RUN gradle build --no-daemon -x test
 
 # Runtime stage
