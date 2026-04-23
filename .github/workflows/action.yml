@@ -27,14 +27,14 @@ jobs:
 
       - name: Run Tests with Coverage
         run: |
-          cd ./MyService
+          cd ./vince
           chmod +x gradlew
           ./gradlew test jacocoTestReport
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: ./MyService/build/reports/jacoco/test/jacocoTestReport.xml
+          files: ./vince/build/reports/jacoco/test/jacocoTestReport.xml
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
@@ -56,14 +56,14 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}     
         run: |
-          cd ./MyService
+          cd ./vince
           chmod +x gradlew
           ./gradlew build sonar --info     
 
 
       - name: Build Docker images
         run: |
-          cd ./MyService
-          docker build -t myservice:latest .
+          cd ./vince
+          docker build -t vince:latest .
 
 
