@@ -1,6 +1,8 @@
 FROM gradle:8.14-jdk21 AS builder
 WORKDIR /app
-COPY . .
+COPY build.gradle settings.gradle gradlew gradlew.bat ./
+COPY gradle ./gradle
+COPY src ./src
 RUN gradle build --no-daemon -x test
 
 # Runtime stage
