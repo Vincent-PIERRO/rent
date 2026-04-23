@@ -320,3 +320,141 @@ Ce projet est configuré pour :
 - Uploader automatiquement vers Codecov en CI/CD
 - Exclure certaines zones (config, entities, DTOs) de la couverture pour plus de clarté
 
+## Qualité du code avec SonarCloud
+
+### Qu'est-ce que SonarCloud ?
+
+**SonarCloud** est une plateforme cloud qui analyse la **qualité du code** en continu. Elle détecte :
+- **Bugs** : Erreurs potentielles et code défectueux
+- **Vulnérabilités de sécurité** : Failles de sécurité connues
+- **Code smells** : Mauvaises pratiques et code difficile à maintenir
+- **Duplications** : Code dupliqué inutile
+- **Couverture de tests** : Intégration avec JaCoCo
+
+### Comment fonctionne SonarCloud ?
+
+À chaque **push** ou **pull request**, le workflow GitHub Actions :
+
+1. Exécute les tests avec JaCoCo (comme vu précédemment)
+2. Lance l'analyse SonarQube
+3. Envoie les résultats à SonarCloud
+4. Ajoute un rapport de qualité à votre PR
+
+### Consulter les résultats sur SonarCloud
+
+1. Allez sur https://sonarcloud.io
+2. Connectez-vous avec votre compte GitHub
+3. Sélectionnez l'organisation `benoit-charroux` et le projet `rent`
+4. Vous verrez un **dashboard complet** avec :
+
+**Métriques principales :**
+- 📊 **Reliability** (Fiabilité) : Nombre de bugs détectés
+- 🔒 **Security** (Sécurité) : Vulnérabilités et hotspots de sécurité
+- 🧹 **Maintainability** (Maintenabilité) : Code smells et dettes techniques
+- ✅ **Coverage** (Couverture) : Pourcentage de code testé (issu de JaCoCo)
+- 🔄 **Duplications** : Pourcentage de code dupliqué
+
+**Détails par fichier :**
+- Cliquez sur **Issues** pour voir tous les problèmes identifiés
+- Filtrez par sévérité : 🔴 Critical, 🟠 Major, 🟡 Minor, ℹ️ Info
+- Consultez les **Pull Requests** pour voir l'historique des analyses
+
+### Interpréter un rapport SonarCloud
+
+**Exemple de qualité :**
+- 🟢 **A** : Excellent, très peu de problèmes
+- 🟢 **B** : Bon, quelques problèmes à corriger
+- 🟡 **C** : Acceptable, mais besoin d'améliorations
+- 🟠 **D** : Faible, plusieurs problèmes
+- 🔴 **E** : Mauvais, nombreux problèmes
+
+### Activer SonarCloud pour les Pull Requests
+
+Le projet est configuré pour afficher des **statuts de qualité** directement dans les PRs :
+
+1. Ouvrez une **Pull Request** sur GitHub
+2. Descendez jusqu'à **Checks**
+3. Vous verrez **SonarCloud Code Analysis**
+4. Le statut peut être :
+   - ✅ **Passed** : La qualité du code est acceptable
+   - ❌ **Failed** : Des problèmes de sécurité ou de qualité critiques ont été détectés
+
+### Bonnes pratiques pour la qualité
+
+✅ **À faire :**
+- Viser une note **A** ou **B** minimum
+- Corriger les vulnérabilités de sécurité avant le merge
+- Revoir les **bugs critiques** et **majeurs**
+- Maintenir la couverture de tests **≥ 80%**
+
+❌ **À éviter :**
+- Merger une PR avec des **issues critiques de sécurité**
+- Ignorer les rapports SonarCloud
+- Augmenter la dette technique sans limite
+
+### Configuration du projet
+
+#### Organisation GitHub vs SonarCloud
+
+- **Organisation GitHub** : `benoit-charroux` (votre compte d'organisation sur GitHub)
+- **Organisation SonarCloud** : `benoit-charroux-1` (créée automatiquement lors de la liaison avec GitHub)
+
+Ces deux organisations sont **liées automatiquement** grâce à l'authentification GitHub. SonarCloud a besoin d'une organisation distincte pour gérer les permissions et les projets.
+
+#### Fichiers de configuration
+
+La configuration SonarCloud se trouve dans deux fichiers :
+
+1. **[MyService/build.gradle](MyService/build.gradle)** - Configuration SonarQube/Gradle
+   - Clé du projet : `benoit-charroux_rent`
+   - Organisation SonarCloud : `benoit-charroux-1`
+   - URL hôte : `https://sonarcloud.io`
+   - Chemins source/test et rapport JaCoCo
+
+2. **[.github/workflows/action.yml](.github/workflows/action.yml)** - Workflow GitHub Actions
+   - Lance l'analyse SonarCloud automatiquement à chaque push/PR
+   - Exécute les tests et génère le rapport JaCoCo
+   - Envoie les résultats à SonarCloud via le `SONAR_TOKEN`
+
+#### Initialiser le SONAR_TOKEN
+
+**Important** : Le `SONAR_TOKEN` est un secret nécessaire pour que GitHub Actions puisse envoyer les résultats à SonarCloud.
+
+**Procédure :**
+
+1. **Générer le token dans SonarCloud**
+   - Allez sur https://sonarcloud.io
+   - Cliquez sur votre profil (coin supérieur droit) → **Security**
+   - Sous **Generate Tokens**, cliquez **Generate**
+   - Donnez-lui un nom (ex: `github-rent`)
+   - **Copiez le token** (vous ne pourrez pas le revoir après)
+
+2. **Ajouter le secret à GitHub**
+   - Allez sur https://github.com/benoit-charroux/rent
+   - **Settings** → **Secrets and variables** → **Actions**
+   - Cliquez **New repository secret**
+   - **Name** : `SONAR_TOKEN`
+   - **Value** : Collez le token SonarCloud
+   - Cliquez **Add secret**
+
+3. **Vérifier que c'est fonctionnel**
+   - Faites un `git push` sur une branche
+   - Allez dans **Actions** et vérifiez que le workflow s'exécute
+   - L'étape **Build and analyze** doit réussir
+   - Allez sur [SonarCloud Dashboard](https://sonarcloud.io/organizations/benoit-charroux-1) pour voir l'analyse
+
+#### Technologies utilisées
+
+Ce projet utilise :
+- **SonarCloud Cloud** : Hébergement sur le cloud (gratuit pour les projets open-source)
+- **Organisation SonarCloud** : `benoit-charroux-1`
+- **Clé du projet** : `benoit-charroux_rent`
+- **Intégration GitHub** : Rapports automatiques dans les PRs et checks
+- **JaCoCo + SonarQube** : Analyse complète de la couverture et de la qualité
+
+### Ressources utiles
+
+- 🌐 [SonarCloud Dashboard](https://sonarcloud.io/organizations/benoit-charroux-1)
+- 📖 [Documentation SonarCloud](https://docs.sonarcloud.io/)
+- 🔐 [Règles de sécurité](https://rules.sonarsource.com/java/)
+

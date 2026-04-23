@@ -27,21 +27,43 @@ jobs:
 
       - name: Run Tests with Coverage
         run: |
-          cd ./MyService
+          cd ./vince
           chmod +x gradlew
           ./gradlew test jacocoTestReport
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: ./MyService/build/reports/jacoco/test/jacocoTestReport.xml
+          files: ./vince/build/reports/jacoco/test/jacocoTestReport.xml
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
 
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Build and analyze
+        env:
+          SONAR_HOST_URL: https://sonarcloud.io
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}     
+        run: |
+          cd ./vince
+          chmod +x gradlew
+          ./gradlew build sonar --info     
+
+
       - name: Build Docker images
         run: |
-          cd ./MyService
-          docker build -t myservice:latest .
+          cd ./vince
+          docker build -t vince:latest .
 
 
